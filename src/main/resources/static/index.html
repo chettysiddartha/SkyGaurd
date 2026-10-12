@@ -1,0 +1,2246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SkyGuard | Aviation Operations & Air Safety Management System</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --sg-navy: #0B192C;
+            --sg-navy-light: #1E3E62;
+            --sg-blue: #008DDA;
+            --sg-cyan: #41C9E2;
+            --sg-bg: #F4F7FA;
+            --sg-card-bg: #FFFFFF;
+            --sg-border: #E2E8F0;
+            --sg-text-main: #0F172A;
+            --sg-text-muted: #64748B;
+        }
+
+        body {
+            background-color: var(--sg-bg);
+            color: var(--sg-text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Aviation Navbar */
+        .sky-navbar {
+            background: linear-gradient(135deg, var(--sg-navy) 0%, #152943 100%);
+            border-bottom: 2px solid rgba(65, 201, 226, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .brand-logo {
+            font-size: 1.45rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #FFFFFF !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pulse-beacon {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #10B981;
+            box-shadow: 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: pulse 1.8s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 9px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* Navigation Tabs */
+        .nav-pills-aviation .nav-link {
+            color: #94A3B8;
+            font-weight: 500;
+            border-radius: 8px;
+            padding: 8px 16px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-pills-aviation .nav-link:hover {
+            color: #FFFFFF;
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .nav-pills-aviation .nav-link.active {
+            color: #FFFFFF;
+            background: linear-gradient(135deg, var(--sg-blue) 0%, #0284C7 100%);
+            box-shadow: 0 4px 12px rgba(0, 141, 218, 0.35);
+        }
+
+        /* Dashboard KPI Cards */
+        .kpi-card {
+            background: var(--sg-card-bg);
+            border: 1px solid var(--sg-border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.06), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background-color: var(--sg-blue);
+        }
+
+        .kpi-card.kpi-green::before { background-color: #10B981; }
+        .kpi-card.kpi-amber::before { background-color: #F59E0B; }
+        .kpi-card.kpi-red::before { background-color: #EF4444; }
+        .kpi-card.kpi-purple::before { background-color: #8B5CF6; }
+
+        .kpi-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--sg-text-muted);
+            margin-bottom: 6px;
+        }
+
+        .kpi-value {
+            font-size: 2.1rem;
+            font-weight: 700;
+            color: var(--sg-text-main);
+            line-height: 1;
+        }
+
+        .kpi-icon {
+            font-size: 2.2rem;
+            opacity: 0.18;
+            position: absolute;
+            right: 18px;
+            top: 18px;
+        }
+
+        /* Glass / Section Cards */
+        .aviation-card {
+            background: var(--sg-card-bg);
+            border: 1px solid var(--sg-border);
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            margin-bottom: 24px;
+        }
+
+        .aviation-card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--sg-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #FAFBFD;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .aviation-card-header h5 {
+            margin: 0;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--sg-navy);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Custom Tables */
+        .aviation-table {
+            margin-bottom: 0;
+        }
+
+        .aviation-table thead th {
+            background-color: #F8FAFC;
+            color: #475569;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            border-bottom: 2px solid var(--sg-border);
+            padding: 12px 16px;
+        }
+
+        .aviation-table tbody td {
+            padding: 14px 16px;
+            vertical-align: middle;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #F1F5F9;
+        }
+
+        .aviation-table tbody tr:hover {
+            background-color: #F8FAFC;
+        }
+
+        /* Status Badges */
+        .badge-status {
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-available { background-color: #ECFDF5; color: #047857; border: 1px solid #A7F3D0; }
+        .badge-inflight { background-color: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+        .badge-maintenance { background-color: #FFFBEB; color: #B45309; border: 1px solid #FDE68A; }
+        .badge-grounded { background-color: #FEF2F2; color: #B91C1C; border: 1px solid #FECACA; }
+        .badge-delayed { background-color: #FFF7ED; color: #C2410C; border: 1px solid #FFEDD5; }
+        .badge-critical { background-color: #450A0A; color: #FCA5A5; border: 1px solid #7F1D1D; }
+
+        /* AI Copilot Terminal Box */
+        .ai-terminal {
+            background-color: #0F172A;
+            border-radius: 12px;
+            color: #E2E8F0;
+            padding: 20px;
+            border: 1px solid #1E293B;
+            display: flex;
+            flex-direction: column;
+            height: 520px;
+        }
+
+        .ai-chat-history {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 8px;
+            margin-bottom: 16px;
+        }
+
+        .ai-msg {
+            margin-bottom: 16px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 0.92rem;
+            line-height: 1.5;
+            max-width: 88%;
+        }
+
+        .ai-msg-user {
+            background-color: #1E3E62;
+            color: #FFFFFF;
+            margin-left: auto;
+            border-bottom-right-radius: 2px;
+        }
+
+        .ai-msg-bot {
+            background-color: #1E293B;
+            color: #E2E8F0;
+            border: 1px solid #334155;
+            margin-right: auto;
+            border-bottom-left-radius: 2px;
+        }
+
+        .quick-chip {
+            background-color: #1E293B;
+            color: #94A3B8;
+            border: 1px solid #334155;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            display: inline-block;
+            margin-right: 6px;
+            margin-bottom: 6px;
+        }
+
+        .quick-chip:hover {
+            color: #FFFFFF;
+            background-color: var(--sg-blue);
+            border-color: var(--sg-blue);
+        }
+
+        /* Toast Container */
+        .toast-container {
+            z-index: 1090;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header / Navbar -->
+    <header class="sky-navbar sticky-top">
+        <div class="container-fluid px-4 py-2">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-3">
+                    <a class="brand-logo text-decoration-none" href="#">
+                        <i class="bi bi-airplane-engines-fill text-info"></i>
+                        <span>SkyGuard</span>
+                        <span class="badge bg-primary bg-opacity-25 text-info fs-6 border border-info border-opacity-25 ms-1">Operations</span>
+                    </a>
+                    <div class="d-none d-md-flex align-items-center gap-2 text-white-50 small border-start border-secondary ps-3 ms-2">
+                        <span class="pulse-beacon"></span>
+                        <span id="telemetryStatus">Radar Online &bull; MySQL 8.0</span>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <ul class="nav nav-pills nav-pills-aviation flex-wrap gap-1" id="mainTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="tab-dashboard" data-bs-toggle="pill" data-bs-target="#pane-dashboard" type="button" role="tab">
+                            <i class="bi bi-speedometer2 me-1"></i> Dashboard
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tab-aircraft" data-bs-toggle="pill" data-bs-target="#pane-aircraft" type="button" role="tab">
+                            <i class="bi bi-airplane me-1"></i> Fleet
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tab-flights" data-bs-toggle="pill" data-bs-target="#pane-flights" type="button" role="tab">
+                            <i class="bi bi-compass me-1"></i> Flights
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tab-maintenance" data-bs-toggle="pill" data-bs-target="#pane-maintenance" type="button" role="tab">
+                            <i class="bi bi-wrench-adjustable me-1"></i> Maintenance
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tab-incidents" data-bs-toggle="pill" data-bs-target="#pane-incidents" type="button" role="tab">
+                            <i class="bi bi-shield-exclamation me-1"></i> Incidents
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link position-relative" id="tab-alerts" data-bs-toggle="pill" data-bs-target="#pane-alerts" type="button" role="tab">
+                            <i class="bi bi-bell me-1"></i> Alerts
+                            <span class="badge bg-danger rounded-pill ms-1" id="navAlertBadge">0</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tab-ai" data-bs-toggle="pill" data-bs-target="#pane-ai" type="button" role="tab">
+                            <i class="bi bi-cpu me-1"></i> AI Copilot
+                        </button>
+                    </li>
+                    <li class="nav-item d-none" id="navAdminItem" role="presentation">
+                        <button class="nav-link" id="tab-users" data-bs-toggle="pill" data-bs-target="#pane-users" type="button" role="tab">
+                            <i class="bi bi-people me-1"></i> Users
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- User Account Actions -->
+                <div class="d-flex align-items-center gap-2" id="userSection">
+                    <div id="loggedOutView" class="d-flex align-items-center gap-2">
+                        <button class="btn btn-outline-light btn-sm px-3" onclick="openAuthModal('login')">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+                        </button>
+                        <button class="btn btn-info btn-sm px-3 text-dark fw-semibold" onclick="openAuthModal('register')">
+                            Register
+                        </button>
+                    </div>
+                    <div id="loggedInView" class="d-none d-flex align-items-center gap-2">
+                        <div class="text-end text-white lh-1">
+                            <div class="fw-semibold small" id="userDisplayName">Captain Smith</div>
+                            <span class="badge bg-info text-dark" id="userRoleBadge" style="font-size: 0.65rem;">ROLE_STAFF</span>
+                        </div>
+                        <button class="btn btn-outline-danger btn-sm p-1 px-2 ms-2" onclick="logout()" title="Logout">
+                            <i class="bi bi-box-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main class="container-fluid px-4 py-4 flex-grow-1">
+
+        <!-- Global Alert Ticker for Critical Events -->
+        <div id="criticalAlertBanner" class="alert alert-danger d-none alert-dismissible fade show shadow-sm" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-exclamation-triangle-fill fs-4 me-3 text-danger"></i>
+                <div class="flex-grow-1">
+                    <strong class="d-block">CRITICAL OPERATIONAL NOTIFICATION</strong>
+                    <span id="criticalAlertText">Aircraft N350AF grounded due to urgent weather radar sensor failure. Immediate inspection scheduled.</span>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+
+        <div class="tab-content" id="mainTabContent">
+
+            <!-- TAB 1: OPERATIONS DASHBOARD -->
+            <div class="tab-pane fade show active" id="pane-dashboard" role="tabpanel">
+                <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+                    <div>
+                        <h3 class="fw-bold mb-1 text-navy">Flight Operations Command Center</h3>
+                        <p class="text-muted small mb-0">Real-time aircraft readiness, active flight tracking, maintenance scheduling & safety telemetry.</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-secondary btn-sm" onclick="loadAllData()">
+                            <i class="bi bi-arrow-clockwise me-1"></i> Refresh Feed
+                        </button>
+                        <button class="btn btn-primary btn-sm px-3" onclick="openScheduleFlightModal()">
+                            <i class="bi bi-plus-circle me-1"></i> Schedule Flight
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPI Metric Cards Grid -->
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6 col-xl-2">
+                        <div class="kpi-card kpi-blue">
+                            <div class="kpi-title">Total Fleet</div>
+                            <div class="kpi-value" id="kpiAircraft">—</div>
+                            <div class="small text-muted mt-2"><span id="kpiAvailableAircraft" class="text-success fw-bold">—</span> available</div>
+                            <i class="bi bi-airplane kpi-icon text-primary"></i>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-2">
+                        <div class="kpi-card kpi-green">
+                            <div class="kpi-title">Active Flights</div>
+                            <div class="kpi-value" id="kpiFlights">—</div>
+                            <div class="small text-muted mt-2"><span id="kpiDelayedFlights" class="text-danger fw-bold">—</span> delayed</div>
+                            <i class="bi bi-compass kpi-icon text-success"></i>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-2">
+                        <div class="kpi-card kpi-amber">
+                            <div class="kpi-title">Maintenance</div>
+                            <div class="kpi-value" id="kpiMaintenance">—</div>
+                            <div class="small text-muted mt-2"><span id="kpiOverdueMaintenance" class="text-danger fw-bold">—</span> overdue</div>
+                            <i class="bi bi-wrench kpi-icon text-warning"></i>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-2">
+                        <div class="kpi-card kpi-red">
+                            <div class="kpi-title">Incidents</div>
+                            <div class="kpi-value" id="kpiIncidents">—</div>
+                            <div class="small text-muted mt-2"><span id="kpiOpenIncidents" class="text-warning fw-bold">—</span> open logs</div>
+                            <i class="bi bi-shield-exclamation kpi-icon text-danger"></i>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-2">
+                        <div class="kpi-card kpi-purple">
+                            <div class="kpi-title">Active Alerts</div>
+                            <div class="kpi-value" id="kpiAlerts">—</div>
+                            <div class="small text-muted mt-2" id="kpiSystemStatusBadge">System: <span class="badge bg-success">OPTIMAL</span></div>
+                            <i class="bi bi-bell kpi-icon text-info"></i>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-2">
+                        <div class="kpi-card bg-primary text-white" style="background: linear-gradient(135deg, #1E3E62 0%, #0B192C 100%);">
+                            <div class="kpi-title text-info">Operations Copilot</div>
+                            <div class="fs-5 fw-bold text-white mt-1">SkyGuard AI</div>
+                            <button class="btn btn-sm btn-info text-dark fw-bold mt-2 w-100" onclick="document.getElementById('tab-ai').click()">
+                                <i class="bi bi-chat-dots me-1"></i> Ask AI
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts & Activity Row -->
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-7">
+                        <div class="aviation-card h-100">
+                            <div class="aviation-card-header">
+                                <h5><i class="bi bi-radar text-primary"></i> Live Flight Schedule & Operations Status</h5>
+                                <button class="btn btn-sm btn-light border" onclick="document.getElementById('tab-flights').click()">View All</button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table aviation-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Flight</th>
+                                            <th>Origin / Dest</th>
+                                            <th>Aircraft</th>
+                                            <th>Departure</th>
+                                            <th>Gate</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dashboardFlightsTable">
+                                        <tr><td colspan="6" class="text-center py-4 text-muted">Loading flight radar...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-5">
+                        <div class="aviation-card h-100">
+                            <div class="aviation-card-header">
+                                <h5><i class="bi bi-pie-chart text-primary"></i> Fleet Status Distribution</h5>
+                            </div>
+                            <div class="card-body d-flex flex-column align-items-center justify-content-center p-3">
+                                <div style="height: 230px; width: 100%; max-width: 320px;">
+                                    <canvas id="fleetStatusChart"></canvas>
+                                </div>
+                                <div class="row w-100 mt-3 text-center small text-muted">
+                                    <div class="col-3"><span class="badge bg-success me-1">&bull;</span> Available</div>
+                                    <div class="col-3"><span class="badge bg-primary me-1">&bull;</span> In Flight</div>
+                                    <div class="col-3"><span class="badge bg-warning me-1">&bull;</span> Maintenance</div>
+                                    <div class="col-3"><span class="badge bg-danger me-1">&bull;</span> Grounded</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Incident & Alert Row -->
+                <div class="row g-4">
+                    <div class="col-lg-6">
+                        <div class="aviation-card">
+                            <div class="aviation-card-header">
+                                <h5><i class="bi bi-shield-alert text-danger"></i> Recent Safety Incidents</h5>
+                                <button class="btn btn-sm btn-outline-danger" onclick="openReportIncidentModal()">+ Report</button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table aviation-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Category</th>
+                                            <th>Location</th>
+                                            <th>Priority</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dashboardIncidentsTable">
+                                        <tr><td colspan="5" class="text-center py-4 text-muted">Loading incidents...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="aviation-card">
+                            <div class="aviation-card-header">
+                                <h5><i class="bi bi-bell-fill text-warning"></i> Active Operations Alerts</h5>
+                                <button class="btn btn-sm btn-light border" onclick="document.getElementById('tab-alerts').click()">Full Console</button>
+                            </div>
+                            <div class="card-body p-3">
+                                <ul class="list-group list-group-flush" id="dashboardAlertsList">
+                                    <li class="list-group-item text-muted text-center py-3">Scanning operational rules...</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: FLEET MANAGEMENT (AIRCRAFT) -->
+            <div class="tab-pane fade" id="pane-aircraft" role="tabpanel">
+                <div class="aviation-card">
+                    <div class="aviation-card-header">
+                        <div>
+                            <h5><i class="bi bi-airplane-fill text-primary"></i> Aircraft Fleet Registry</h5>
+                            <small class="text-muted">Manage airline fleet inventory, specifications, airworthiness, and service schedules.</small>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="openAddAircraftModal()">
+                            <i class="bi bi-plus-lg me-1"></i> Register Aircraft
+                        </button>
+                    </div>
+                    <div class="p-3 border-bottom bg-light">
+                        <div class="row g-2">
+                            <div class="col-md-6 col-lg-4">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                    <input type="text" id="aircraftSearchInput" class="form-control" placeholder="Search registration, model, station..." oninput="filterAircraftTable()">
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-3">
+                                <select id="aircraftStatusFilter" class="form-select form-select-sm" onchange="filterAircraftTable()">
+                                    <option value="">All Statuses</option>
+                                    <option value="AVAILABLE">AVAILABLE</option>
+                                    <option value="IN_FLIGHT">IN_FLIGHT</option>
+                                    <option value="MAINTENANCE">MAINTENANCE</option>
+                                    <option value="GROUNDED">GROUNDED</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table aviation-table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Registration</th>
+                                    <th>Model & Manufacturer</th>
+                                    <th>Capacity</th>
+                                    <th>Location</th>
+                                    <th>Status</th>
+                                    <th>Next Maintenance</th>
+                                    <th>Hours</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="aircraftTableBody">
+                                <tr><td colspan="8" class="text-center py-4 text-muted">Loading fleet...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: FLIGHT OPERATIONS -->
+            <div class="tab-pane fade" id="pane-flights" role="tabpanel">
+                <div class="aviation-card">
+                    <div class="aviation-card-header">
+                        <div>
+                            <h5><i class="bi bi-compass-fill text-primary"></i> Flight Scheduling & Radar</h5>
+                            <small class="text-muted">Monitor dispatch schedules, departure/arrival gates, and active flight statuses.</small>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="openScheduleFlightModal()">
+                            <i class="bi bi-plus-lg me-1"></i> Schedule Flight
+                        </button>
+                    </div>
+                    <div class="p-3 border-bottom bg-light">
+                        <div class="row g-2">
+                            <div class="col-md-6 col-lg-4">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                    <input type="text" id="flightSearchInput" class="form-control" placeholder="Search flight #, origin, destination..." oninput="filterFlightsTable()">
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-3">
+                                <select id="flightStatusFilter" class="form-select form-select-sm" onchange="filterFlightsTable()">
+                                    <option value="">All Statuses</option>
+                                    <option value="SCHEDULED">SCHEDULED</option>
+                                    <option value="BOARDING">BOARDING</option>
+                                    <option value="IN_FLIGHT">IN_FLIGHT</option>
+                                    <option value="LANDED">LANDED</option>
+                                    <option value="DELAYED">DELAYED</option>
+                                    <option value="CANCELLED">CANCELLED</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table aviation-table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Flight</th>
+                                    <th>Route</th>
+                                    <th>Aircraft</th>
+                                    <th>Departure</th>
+                                    <th>Arrival</th>
+                                    <th>Gate & Terminal</th>
+                                    <th>Pax</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="flightsTableBody">
+                                <tr><td colspan="9" class="text-center py-4 text-muted">Loading flights...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: MAINTENANCE HUB -->
+            <div class="tab-pane fade" id="pane-maintenance" role="tabpanel">
+                <div class="aviation-card">
+                    <div class="aviation-card-header">
+                        <div>
+                            <h5><i class="bi bi-wrench-adjustable-circle-fill text-warning"></i> Airframe & Engine Maintenance Work Orders</h5>
+                            <small class="text-muted">Track routine inspections, component overhauls, avionics diagnostics, and regulatory airworthiness compliance.</small>
+                        </div>
+                        <button class="btn btn-warning btn-sm fw-semibold" onclick="openAddMaintenanceModal()">
+                            <i class="bi bi-plus-lg me-1"></i> New Work Order
+                        </button>
+                    </div>
+                    <div class="p-3 border-bottom bg-light">
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <input type="text" id="maintenanceSearchInput" class="form-control form-control-sm" placeholder="Search aircraft registration, task..." oninput="filterMaintenanceTable()">
+                            </div>
+                            <div class="col-md-3">
+                                <select id="maintenancePriorityFilter" class="form-select form-select-sm" onchange="filterMaintenanceTable()">
+                                    <option value="">All Priorities</option>
+                                    <option value="CRITICAL">CRITICAL</option>
+                                    <option value="HIGH">HIGH</option>
+                                    <option value="MEDIUM">MEDIUM</option>
+                                    <option value="LOW">LOW</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select id="maintenanceStatusFilter" class="form-select form-select-sm" onchange="filterMaintenanceTable()">
+                                    <option value="">All Statuses</option>
+                                    <option value="OPEN">OPEN</option>
+                                    <option value="IN_PROGRESS">IN_PROGRESS</option>
+                                    <option value="COMPLETED">COMPLETED</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table aviation-table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Aircraft</th>
+                                    <th>Task / Defect</th>
+                                    <th>Type</th>
+                                    <th>Priority</th>
+                                    <th>Due Date</th>
+                                    <th>Est. Cost</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="maintenanceTableBody">
+                                <tr><td colspan="8" class="text-center py-4 text-muted">Loading maintenance records...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: INCIDENTS & SAFETY -->
+            <div class="tab-pane fade" id="pane-incidents" role="tabpanel">
+                <div class="aviation-card">
+                    <div class="aviation-card-header">
+                        <div>
+                            <h5><i class="bi bi-shield-shaded text-danger"></i> Safety Incidents & Hazard Reporting</h5>
+                            <small class="text-muted">ICAO Annex 13 compliant incident recording, safety investigation workflows, and preventative actions.</small>
+                        </div>
+                        <button class="btn btn-danger btn-sm" onclick="openReportIncidentModal()">
+                            <i class="bi bi-exclamation-triangle me-1"></i> Report Incident
+                        </button>
+                    </div>
+                    <div class="p-3 border-bottom bg-light">
+                        <div class="row g-2">
+                            <div class="col-md-5">
+                                <input type="text" id="incidentSearchInput" class="form-control form-control-sm" placeholder="Search category, location, description..." oninput="filterIncidentsTable()">
+                            </div>
+                            <div class="col-md-3">
+                                <select id="incidentCategoryFilter" class="form-select form-select-sm" onchange="filterIncidentsTable()">
+                                    <option value="">All Categories</option>
+                                    <option value="BIRD_STRIKE">BIRD_STRIKE</option>
+                                    <option value="WEATHER">WEATHER</option>
+                                    <option value="MECHANICAL">MECHANICAL</option>
+                                    <option value="SYSTEM_FAILURE">SYSTEM_FAILURE</option>
+                                    <option value="SECURITY">SECURITY</option>
+                                    <option value="RUNWAY_INCURSION">RUNWAY_INCURSION</option>
+                                    <option value="OTHER">OTHER</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table aviation-table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Incident #</th>
+                                    <th>Category</th>
+                                    <th>Location</th>
+                                    <th>Description</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th>Reported At</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="incidentsTableBody">
+                                <tr><td colspan="8" class="text-center py-4 text-muted">Loading incident reports...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 6: ALERTS CONSOLE -->
+            <div class="tab-pane fade" id="pane-alerts" role="tabpanel">
+                <div class="aviation-card">
+                    <div class="aviation-card-header">
+                        <div>
+                            <h5><i class="bi bi-broadcast text-danger"></i> Real-Time Safety & Operational Rules Engine</h5>
+                            <small class="text-muted">Automated triggers evaluating aircraft airworthiness, impending service windows, and risk alerts.</small>
+                        </div>
+                        <button class="btn btn-outline-primary btn-sm" onclick="loadAlerts()">
+                            <i class="bi bi-arrow-clockwise me-1"></i> Re-evaluate Rules
+                        </button>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3" id="alertsGrid">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 7: AI OPERATIONS COPILOT -->
+            <div class="tab-pane fade" id="pane-ai" role="tabpanel">
+                <div class="row">
+                    <div class="col-lg-8 mx-auto">
+                        <div class="ai-terminal shadow-lg">
+                            <div class="d-flex align-items-center justify-content-between pb-3 border-bottom border-secondary mb-3">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-robot text-info fs-4"></i>
+                                    <div>
+                                        <span class="fw-bold text-white">SkyGuard AI Operations Copilot</span>
+                                        <div class="text-white-50" style="font-size: 0.75rem;">Aviation Standard Operating Procedure & Decision Support</div>
+                                    </div>
+                                </div>
+                                <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25">Ready</span>
+                            </div>
+
+                            <div class="ai-chat-history" id="aiChatHistory">
+                                <div class="ai-msg ai-msg-bot">
+                                    <strong>✈ SkyGuard Copilot:</strong><br>
+                                    Welcome to SkyGuard AI Assistant. I can assist flight dispatchers, maintenance supervisors, and safety officers with:
+                                    <ul class="mb-1 mt-1 ps-3">
+                                        <li>FAA / ICAO airworthiness directives and A/C check intervals</li>
+                                        <li>Diversion and weather alternate planning protocols</li>
+                                        <li>Emergency checklist recommendations for bird strikes or engine snags</li>
+                                        <li>Fleet turnaround optimization strategies</li>
+                                    </ul>
+                                    How may I assist your flight operations today?
+                                </div>
+                            </div>
+
+                            <!-- Quick Suggestion Chips -->
+                            <div class="mb-2">
+                                <span class="quick-chip" onclick="askPreset('What is the procedure for an overdue C-check?')">Overdue C-Check</span>
+                                <span class="quick-chip" onclick="askPreset('How to handle a bird strike report during climb?')">Bird Strike Response</span>
+                                <span class="quick-chip" onclick="askPreset('What are weather alternate minimums under ICAO?')">Weather Alternates</span>
+                                <span class="quick-chip" onclick="askPreset('Turnaround optimization for delayed Boeing 787')">Turnaround Optimization</span>
+                            </div>
+
+                            <!-- Input Form -->
+                            <form id="aiForm" onsubmit="submitAiQuestion(event)" class="d-flex gap-2">
+                                <input type="text" id="aiInput" class="form-control bg-dark text-white border-secondary" placeholder="Ask a question about fleet, flights, safety, or maintenance..." required>
+                                <button type="submit" class="btn btn-info text-dark fw-bold px-4" id="aiSubmitBtn">
+                                    <i class="bi bi-send-fill"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 8: USER MANAGEMENT (ADMIN ONLY) -->
+            <div class="tab-pane fade" id="pane-users" role="tabpanel">
+                <div class="aviation-card">
+                    <div class="aviation-card-header">
+                        <div>
+                            <h5><i class="bi bi-people-fill text-primary"></i> User Access & Role Administration</h5>
+                            <small class="text-muted">Manage staff accounts, pilot access credentials, and security roles (ADMIN, STAFF, VIEWER).</small>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table aviation-table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Username</th>
+                                    <th>Full Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Created At</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <tr><td colspan="7" class="text-center py-4 text-muted">Loading user accounts...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-top py-3 mt-auto">
+        <div class="container-fluid px-4 d-flex justify-content-between align-items-center flex-wrap gap-2 text-muted small">
+            <div>
+                <strong>SkyGuard Aviation Operations System</strong> &bull; Version 1.0.0 &bull; Java 21 / Spring Boot 3.4.4 &bull; MySQL 8.0
+            </div>
+            <div>
+                Decision-Support & Aviation Fleet Optimization &bull; Educational & Research System
+            </div>
+        </div>
+    </footer>
+
+    <!-- ======================================================== -->
+    <!-- MODALS SECTION -->
+    <!-- ======================================================== -->
+
+    <!-- Add/Edit Aircraft Modal -->
+    <div class="modal fade" id="aircraftModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="aircraftModalTitle"><i class="bi bi-airplane me-2"></i> Register New Aircraft</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="aircraftForm" onsubmit="saveAircraft(event)">
+                    <input type="hidden" id="aircraftId">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Tail Registration *</label>
+                            <input type="text" id="acRegistration" class="form-control" placeholder="e.g. N787UA" required>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Model *</label>
+                                <input type="text" id="acModel" class="form-control" placeholder="e.g. Boeing 787-9" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Manufacturer</label>
+                                <input type="text" id="acManufacturer" class="form-control" placeholder="e.g. Boeing" value="Boeing">
+                            </div>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Passenger Capacity</label>
+                                <input type="number" id="acCapacity" class="form-control" value="180">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Base / Location</label>
+                                <input type="text" id="acLocation" class="form-control" placeholder="e.g. JFK" value="JFK">
+                            </div>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Status</label>
+                                <select id="acStatus" class="form-select">
+                                    <option value="AVAILABLE">AVAILABLE</option>
+                                    <option value="IN_FLIGHT">IN_FLIGHT</option>
+                                    <option value="MAINTENANCE">MAINTENANCE</option>
+                                    <option value="GROUNDED">GROUNDED</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Next Maintenance Due</label>
+                                <input type="date" id="acNextMaintenance" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary btn-sm px-3" id="saveAircraftBtn">Save Aircraft</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule Flight Modal -->
+    <div class="modal fade" id="flightModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="flightModalTitle"><i class="bi bi-compass me-2"></i> Schedule Flight</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="flightForm" onsubmit="saveFlight(event)">
+                    <input type="hidden" id="flightId">
+                    <div class="modal-body">
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Flight Number *</label>
+                                <input type="text" id="flNumber" class="form-control" placeholder="e.g. SG-101" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Assigned Aircraft</label>
+                                <select id="flAircraft" class="form-select">
+                                    <option value="">Select Aircraft...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Origin Airport (ICAO/IATA) *</label>
+                                <input type="text" id="flOrigin" class="form-control" placeholder="e.g. JFK" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Destination Airport *</label>
+                                <input type="text" id="flDestination" class="form-control" placeholder="e.g. LHR" required>
+                            </div>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Departure Time *</label>
+                                <input type="datetime-local" id="flDeparture" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Arrival Time *</label>
+                                <input type="datetime-local" id="flArrival" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Terminal</label>
+                                <input type="text" id="flTerminal" class="form-control" value="T4">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Gate</label>
+                                <input type="text" id="flGate" class="form-control" value="B14">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold">Passengers</label>
+                                <input type="number" id="flPax" class="form-control" value="160">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Flight Status</label>
+                            <select id="flStatus" class="form-select">
+                                <option value="SCHEDULED">SCHEDULED</option>
+                                <option value="BOARDING">BOARDING</option>
+                                <option value="IN_FLIGHT">IN_FLIGHT</option>
+                                <option value="LANDED">LANDED</option>
+                                <option value="DELAYED">DELAYED</option>
+                                <option value="CANCELLED">CANCELLED</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary btn-sm px-3" id="saveFlightBtn">Save Flight</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Maintenance Modal -->
+    <div class="modal fade" id="maintenanceModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="maintModalTitle"><i class="bi bi-wrench me-2"></i> Create Maintenance Work Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="maintenanceForm" onsubmit="saveMaintenance(event)">
+                    <input type="hidden" id="maintId">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Aircraft Registration *</label>
+                            <select id="maintAircraft" class="form-select" required>
+                                <option value="">Select Aircraft...</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Task / Defect Description *</label>
+                            <textarea id="maintDescription" class="form-control" rows="2" placeholder="e.g. Ultrasonic inspection of turbine fan blades and seal replacement." required></textarea>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Maintenance Type</label>
+                                <select id="maintType" class="form-select">
+                                    <option value="ROUTINE">ROUTINE</option>
+                                    <option value="INSPECTION">INSPECTION</option>
+                                    <option value="AVIONICS">AVIONICS</option>
+                                    <option value="ENGINE_OVERHAUL">ENGINE OVERHAUL</option>
+                                    <option value="EMERGENCY">EMERGENCY</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Priority</label>
+                                <select id="maintPriority" class="form-select">
+                                    <option value="LOW">LOW</option>
+                                    <option value="MEDIUM" selected>MEDIUM</option>
+                                    <option value="HIGH">HIGH</option>
+                                    <option value="CRITICAL">CRITICAL</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Due Date *</label>
+                                <input type="date" id="maintDueDate" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Estimated Cost ($)</label>
+                                <input type="number" id="maintCost" class="form-control" value="5000">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-warning btn-sm px-3 fw-semibold">Submit Work Order</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Incident Modal -->
+    <div class="modal fade" id="incidentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-shield-exclamation text-danger me-2"></i> Report Safety Incident / Hazard</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="incidentForm" onsubmit="saveIncident(event)">
+                    <div class="modal-body">
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Category *</label>
+                                <select id="incCategory" class="form-select" required>
+                                    <option value="BIRD_STRIKE">BIRD_STRIKE</option>
+                                    <option value="WEATHER">WEATHER</option>
+                                    <option value="MECHANICAL">MECHANICAL</option>
+                                    <option value="SYSTEM_FAILURE">SYSTEM_FAILURE</option>
+                                    <option value="SECURITY">SECURITY</option>
+                                    <option value="RUNWAY_INCURSION">RUNWAY_INCURSION</option>
+                                    <option value="MEDICAL">MEDICAL</option>
+                                    <option value="OTHER">OTHER</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Priority *</label>
+                                <select id="incPriority" class="form-select" required>
+                                    <option value="LOW">LOW</option>
+                                    <option value="MEDIUM" selected>MEDIUM</option>
+                                    <option value="HIGH">HIGH</option>
+                                    <option value="CRITICAL">CRITICAL</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Incident Location / Airspace *</label>
+                            <input type="text" id="incLocation" class="form-control" placeholder="e.g. JFK Runway 31L or Waypoint DEN-08" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Detailed Incident Description *</label>
+                            <textarea id="incDescription" class="form-control" rows="3" placeholder="Provide factual details, altitude, phase of flight, and immediate actions taken." required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Reported By</label>
+                            <input type="text" id="incReportedBy" class="form-control" value="Flight Operations Officer">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger btn-sm px-3">Submit Incident Report</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Authentication Modal (Login & Register) -->
+    <div class="modal fade" id="authModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <ul class="nav nav-pills w-100" id="authTab" role="tablist">
+                        <li class="nav-item flex-fill text-center">
+                            <button class="nav-link active w-100" id="auth-login-tab" data-bs-toggle="pill" data-bs-target="#auth-login-pane" type="button">Sign In</button>
+                        </li>
+                        <li class="nav-item flex-fill text-center">
+                            <button class="nav-link w-100" id="auth-reg-tab" data-bs-toggle="pill" data-bs-target="#auth-reg-pane" type="button">Register</button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="tab-content" id="authTabContent">
+
+                        <!-- LOGIN PANE -->
+                        <div class="tab-pane fade show active" id="auth-login-pane">
+                            <div class="text-center mb-3">
+                                <i class="bi bi-airplane-fill fs-1 text-primary"></i>
+                                <h5 class="fw-bold mt-2">SkyGuard Portal Access</h5>
+                                <p class="text-muted small">Sign in to access flight dispatch, fleet control, and safety tools.</p>
+                            </div>
+                            <form onsubmit="handleLogin(event)">
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Username</label>
+                                    <input type="text" id="loginUsername" class="form-control" placeholder="Enter username" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Password</label>
+                                    <input type="password" id="loginPassword" class="form-control" placeholder="Enter password" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">Sign In</button>
+                            </form>
+
+                            <hr class="my-4">
+
+                            <!-- Quick 1-Click Demo Login Shortcuts -->
+                            <div class="text-center">
+                                <small class="text-muted d-block mb-2 fw-bold text-uppercase" style="font-size: 0.7rem;">Quick 1-Click Demo Logins</small>
+                                <div class="d-flex justify-content-center gap-2">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="quickLogin('admin', 'admin123')">
+                                        <i class="bi bi-person-fill-gear"></i> Admin
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-info" onclick="quickLogin('staff', 'staff123')">
+                                        <i class="bi bi-person-badge"></i> Staff
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="quickLogin('pilot', 'pilot123')">
+                                        <i class="bi bi-person"></i> Pilot
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- REGISTER PANE -->
+                        <div class="tab-pane fade" id="auth-reg-pane">
+                            <div class="text-center mb-3">
+                                <h5 class="fw-bold">Create Staff Account</h5>
+                                <p class="text-muted small">Register a new operator profile for SkyGuard system access.</p>
+                            </div>
+                            <form onsubmit="handleRegister(event)">
+                                <div class="mb-2">
+                                    <label class="form-label small fw-bold">Username *</label>
+                                    <input type="text" id="regUsername" class="form-control" placeholder="Choose username" required>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label small fw-bold">Full Name</label>
+                                    <input type="text" id="regFullName" class="form-control" placeholder="e.g. Alex Morgan">
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label small fw-bold">Email</label>
+                                    <input type="email" id="regEmail" class="form-control" placeholder="alex@skyguard.aero">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Password *</label>
+                                    <input type="password" id="regPassword" class="form-control" placeholder="Create secure password" required>
+                                </div>
+                                <button type="submit" class="btn btn-success w-100 py-2 fw-semibold">Create Account</button>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="liveToast" class="toast align-items-center text-white bg-dark border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="toastMessage">
+                    Action executed successfully.
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- SkyGuard Application Core Engine -->
+    <script>
+        // State variables
+        let currentUser = null;
+        let globalData = {
+            aircraft: [],
+            flights: [],
+            maintenance: [],
+            incidents: [],
+            alerts: [],
+            summary: {}
+        };
+        let fleetChartInstance = null;
+
+        // API Helpers
+        async function api(endpoint, options = {}) {
+            const defaults = {
+                headers: { 'Content-Type': 'application/json' }
+            };
+            const res = await fetch('/api' + endpoint, { ...defaults, ...options });
+            if (!res.ok) {
+                let errText = await res.text();
+                try {
+                    const parsed = JSON.parse(errText);
+                    errText = parsed.message || errText;
+                } catch(e) {}
+                throw new Error(errText || 'Request failed with status ' + res.status);
+            }
+            if (res.status === 204) return null;
+            return res.json();
+        }
+
+        function showToast(msg, isError = false) {
+            const toastEl = document.getElementById('liveToast');
+            const toastBody = document.getElementById('toastMessage');
+            toastBody.textContent = msg;
+            toastEl.className = `toast align-items-center text-white border-0 ${isError ? 'bg-danger' : 'bg-dark'}`;
+            const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+            toast.show();
+        }
+
+        // ==========================================
+        // INITIALIZATION & AUTHENTICATION
+        // ==========================================
+        window.addEventListener('DOMContentLoaded', async () => {
+            initChart();
+            await checkAuth();
+            await loadAllData();
+            // Auto refresh telemetry every 30 seconds
+            setInterval(() => loadAllData(false), 30000);
+        });
+
+        async function checkAuth() {
+            try {
+                const user = await api('/auth/me');
+                if (user && user.authenticated) {
+                    setLoggedInUser(user);
+                } else {
+                    setLoggedOutUser();
+                }
+            } catch (e) {
+                setLoggedOutUser();
+            }
+        }
+
+        function setLoggedInUser(user) {
+            currentUser = user;
+            document.getElementById('loggedOutView').classList.add('d-none');
+            document.getElementById('loggedInView').classList.remove('d-none');
+            document.getElementById('userDisplayName').textContent = user.fullName || user.username;
+            document.getElementById('userRoleBadge').textContent = user.role.replace('ROLE_', '');
+
+            if (user.role === 'ROLE_ADMIN') {
+                document.getElementById('navAdminItem').classList.remove('d-none');
+            } else {
+                document.getElementById('navAdminItem').classList.add('d-none');
+            }
+        }
+
+        function setLoggedOutUser() {
+            currentUser = null;
+            document.getElementById('loggedOutView').classList.remove('d-none');
+            document.getElementById('loggedInView').classList.add('d-none');
+            document.getElementById('navAdminItem').classList.add('d-none');
+        }
+
+        function openAuthModal(mode = 'login') {
+            const tabId = mode === 'login' ? 'auth-login-tab' : 'auth-reg-tab';
+            document.getElementById(tabId).click();
+            new bootstrap.Modal(document.getElementById('authModal')).show();
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('loginUsername').value;
+            const p = document.getElementById('loginPassword').value;
+            try {
+                const res = await api('/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ username: u, password: p })
+                });
+                bootstrap.Modal.getInstance(document.getElementById('authModal')).hide();
+                showToast(res.message || 'Logged in successfully!');
+                await checkAuth();
+                loadAllData();
+            } catch (err) {
+                alert('Sign in failed: ' + err.message);
+            }
+        }
+
+        async function quickLogin(u, p) {
+            document.getElementById('loginUsername').value = u;
+            document.getElementById('loginPassword').value = p;
+            try {
+                const res = await api('/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ username: u, password: p })
+                });
+                bootstrap.Modal.getInstance(document.getElementById('authModal')).hide();
+                showToast(res.message || 'Logged in successfully as ' + u);
+                await checkAuth();
+                loadAllData();
+            } catch (err) {
+                alert('Sign in failed: ' + err.message);
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const username = document.getElementById('regUsername').value;
+            const fullName = document.getElementById('regFullName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+
+            try {
+                const res = await api('/auth/register', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, fullName, email, password })
+                });
+                showToast(res.message);
+                document.getElementById('auth-login-tab').click();
+                document.getElementById('loginUsername').value = username;
+                document.getElementById('loginPassword').value = password;
+            } catch (err) {
+                alert('Registration failed: ' + err.message);
+            }
+        }
+
+        async function logout() {
+            try {
+                await api('/auth/logout', { method: 'POST' });
+            } catch (e) {}
+            setLoggedOutUser();
+            showToast('You have signed out.');
+            loadAllData();
+        }
+
+        // ==========================================
+        // DATA LOADING & RENDERING
+        // ==========================================
+        async function loadAllData(showNotification = true) {
+            try {
+                const [summary, aircraft, flights, maintenance, incidents, alerts] = await Promise.all([
+                    api('/summary'),
+                    api('/aircraft'),
+                    api('/flights'),
+                    api('/maintenance'),
+                    api('/incidents'),
+                    api('/alerts')
+                ]);
+
+                globalData = { summary, aircraft, flights, maintenance, incidents, alerts };
+
+                renderSummary(summary);
+                renderAircraftTable(aircraft);
+                renderFlightsTable(flights);
+                renderMaintenanceTable(maintenance);
+                renderIncidentsTable(incidents);
+                renderAlerts(alerts);
+                updateCharts(aircraft, flights);
+                populateAircraftDropdowns(aircraft);
+
+                if (currentUser && currentUser.role === 'ROLE_ADMIN') {
+                    loadUsers();
+                }
+
+                if (showNotification) {
+                    showToast('Operations telemetry updated.');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function renderSummary(s) {
+            document.getElementById('kpiAircraft').textContent = s.aircraft || 0;
+            document.getElementById('kpiAvailableAircraft').textContent = s.availableAircraft || 0;
+
+            document.getElementById('kpiFlights').textContent = s.flights || 0;
+            document.getElementById('kpiDelayedFlights').textContent = s.delayedFlights || 0;
+
+            document.getElementById('kpiMaintenance').textContent = s.maintenance || 0;
+            document.getElementById('kpiOverdueMaintenance').textContent = s.overdueMaintenance || 0;
+
+            document.getElementById('kpiIncidents').textContent = s.incidents || 0;
+            document.getElementById('kpiOpenIncidents').textContent = s.openIncidents || 0;
+
+            document.getElementById('kpiAlerts').textContent = s.alerts || 0;
+            document.getElementById('navAlertBadge').textContent = s.alerts || 0;
+
+            const status = s.systemStatus || 'OPTIMAL';
+            const statusEl = document.getElementById('kpiSystemStatusBadge');
+            if (status === 'ALERT') {
+                statusEl.innerHTML = 'System: <span class="badge bg-danger">ALERT</span>';
+            } else if (status === 'WARNING') {
+                statusEl.innerHTML = 'System: <span class="badge bg-warning text-dark">WARNING</span>';
+            } else {
+                statusEl.innerHTML = 'System: <span class="badge bg-success">OPTIMAL</span>';
+            }
+        }
+
+        function populateAircraftDropdowns(aircraftList) {
+            const flSelect = document.getElementById('flAircraft');
+            const maintSelect = document.getElementById('maintAircraft');
+
+            const options = aircraftList
+                .map(a => `<option value="${a.registration}">${a.registration} (${a.model} - ${a.status})</option>`)
+                .join('');
+
+            flSelect.innerHTML = '<option value="">Select Aircraft...</option>' + options;
+            maintSelect.innerHTML = '<option value="">Select Aircraft...</option>' + options;
+        }
+
+        // ==========================================
+        // AIRCRAFT MODULE
+        // ==========================================
+        function renderAircraftTable(list) {
+            const tbody = document.getElementById('aircraftTableBody');
+            if (!list || list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted">No aircraft registered in fleet.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = list.map(a => {
+                let badgeClass = 'badge-available';
+                if (a.status === 'IN_FLIGHT') badgeClass = 'badge-inflight';
+                if (a.status === 'MAINTENANCE') badgeClass = 'badge-maintenance';
+                if (a.status === 'GROUNDED') badgeClass = 'badge-grounded';
+
+                return `
+                    <tr>
+                        <td class="fw-bold text-primary">${a.registration}</td>
+                        <td>
+                            <div class="fw-semibold">${a.model}</div>
+                            <small class="text-muted">${a.manufacturer || 'Boeing'}</small>
+                        </td>
+                        <td>${a.capacity || 180} seats</td>
+                        <td><span class="badge bg-light text-dark border">${a.location || 'JFK'}</span></td>
+                        <td><span class="badge-status ${badgeClass}">${a.status}</span></td>
+                        <td>${a.nextMaintenance || '—'}</td>
+                        <td>${a.totalFlightHours || 0} hrs</td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-secondary" onclick="editAircraft(${a.id})" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-outline-danger" onclick="deleteAircraft(${a.id}, '${a.registration}')" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterAircraftTable() {
+            const q = document.getElementById('aircraftSearchInput').value.toLowerCase();
+            const status = document.getElementById('aircraftStatusFilter').value;
+
+            const filtered = globalData.aircraft.filter(a => {
+                const matchQ = (a.registration && a.registration.toLowerCase().includes(q)) ||
+                               (a.model && a.model.toLowerCase().includes(q)) ||
+                               (a.location && a.location.toLowerCase().includes(q));
+                const matchStatus = !status || a.status === status;
+                return matchQ && matchStatus;
+            });
+            renderAircraftTable(filtered);
+        }
+
+        function openAddAircraftModal() {
+            document.getElementById('aircraftModalTitle').innerHTML = '<i class="bi bi-airplane me-2"></i> Register New Aircraft';
+            document.getElementById('aircraftId').value = '';
+            document.getElementById('acRegistration').value = '';
+            document.getElementById('acRegistration').disabled = false;
+            document.getElementById('acModel').value = '';
+            document.getElementById('acManufacturer').value = 'Boeing';
+            document.getElementById('acCapacity').value = '180';
+            document.getElementById('acLocation').value = 'JFK';
+            document.getElementById('acStatus').value = 'AVAILABLE';
+            document.getElementById('acNextMaintenance').value = '';
+            new bootstrap.Modal(document.getElementById('aircraftModal')).show();
+        }
+
+        function editAircraft(id) {
+            const a = globalData.aircraft.find(x => x.id === id);
+            if (!a) return;
+            document.getElementById('aircraftModalTitle').innerHTML = '<i class="bi bi-pencil-square me-2"></i> Edit Aircraft Details';
+            document.getElementById('aircraftId').value = a.id;
+            document.getElementById('acRegistration').value = a.registration;
+            document.getElementById('acModel').value = a.model;
+            document.getElementById('acManufacturer').value = a.manufacturer || 'Boeing';
+            document.getElementById('acCapacity').value = a.capacity || 180;
+            document.getElementById('acLocation').value = a.location || 'JFK';
+            document.getElementById('acStatus').value = a.status;
+            document.getElementById('acNextMaintenance').value = a.nextMaintenance || '';
+            new bootstrap.Modal(document.getElementById('aircraftModal')).show();
+        }
+
+        async function saveAircraft(e) {
+            e.preventDefault();
+            const id = document.getElementById('aircraftId').value;
+            const payload = {
+                registration: document.getElementById('acRegistration').value.trim().toUpperCase(),
+                model: document.getElementById('acModel').value.trim(),
+                manufacturer: document.getElementById('acManufacturer').value.trim(),
+                capacity: parseInt(document.getElementById('acCapacity').value) || 180,
+                location: document.getElementById('acLocation').value.trim(),
+                status: document.getElementById('acStatus').value,
+                nextMaintenance: document.getElementById('acNextMaintenance').value || null
+            };
+
+            try {
+                if (id) {
+                    await api(`/aircraft/${id}`, { method: 'PUT', body: JSON.stringify(payload) });
+                    showToast(`Aircraft ${payload.registration} updated.`);
+                } else {
+                    await api('/aircraft', { method: 'POST', body: JSON.stringify(payload) });
+                    showToast(`Aircraft ${payload.registration} registered.`);
+                }
+                bootstrap.Modal.getInstance(document.getElementById('aircraftModal')).hide();
+                loadAllData();
+            } catch (err) {
+                alert('Aircraft operation failed: ' + err.message);
+            }
+        }
+
+        async function deleteAircraft(id, reg) {
+            if (!confirm(`Are you sure you want to remove aircraft ${reg} from fleet registry?`)) return;
+            try {
+                await api(`/aircraft/${id}`, { method: 'DELETE' });
+                showToast(`Aircraft ${reg} deleted.`);
+                loadAllData();
+            } catch (err) {
+                alert('Deletion failed: ' + err.message);
+            }
+        }
+
+        // ==========================================
+        // FLIGHTS MODULE
+        // ==========================================
+        function renderFlightsTable(list) {
+            const tbody = document.getElementById('flightsTableBody');
+            const dashBody = document.getElementById('dashboardFlightsTable');
+
+            if (!list || list.length === 0) {
+                const emptyRow = '<tr><td colspan="9" class="text-center py-4 text-muted">No scheduled flights found.</td></tr>';
+                tbody.innerHTML = emptyRow;
+                dashBody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">No scheduled flights found.</td></tr>';
+                return;
+            }
+
+            // Populate Main Table
+            tbody.innerHTML = list.map(f => {
+                let badgeClass = 'badge-available';
+                if (f.status === 'IN_FLIGHT') badgeClass = 'badge-inflight';
+                if (f.status === 'DELAYED') badgeClass = 'badge-delayed';
+                if (f.status === 'CANCELLED') badgeClass = 'badge-grounded';
+                if (f.status === 'BOARDING') badgeClass = 'badge-maintenance';
+
+                const dep = f.departureTime ? f.departureTime.replace('T', ' ').substring(0, 16) : '—';
+                const arr = f.arrivalTime ? f.arrivalTime.replace('T', ' ').substring(0, 16) : '—';
+
+                return `
+                    <tr>
+                        <td class="fw-bold text-navy">${f.flightNumber}</td>
+                        <td>
+                            <span class="fw-bold">${f.origin}</span>
+                            <i class="bi bi-arrow-right text-muted mx-1"></i>
+                            <span class="fw-bold">${f.destination}</span>
+                        </td>
+                        <td><span class="badge bg-light text-primary border">${f.aircraftRegistration || 'Unassigned'}</span></td>
+                        <td class="small">${dep}</td>
+                        <td class="small">${arr}</td>
+                        <td>${f.terminal || 'T1'} / Gate ${f.gate || 'A1'}</td>
+                        <td>${f.passengerCount || 0}</td>
+                        <td>
+                            <select class="form-select form-select-sm py-0 badge-status ${badgeClass}" onchange="changeFlightStatus(${f.id}, this.value)">
+                                <option value="SCHEDULED" ${f.status === 'SCHEDULED' ? 'selected' : ''}>SCHEDULED</option>
+                                <option value="BOARDING" ${f.status === 'BOARDING' ? 'selected' : ''}>BOARDING</option>
+                                <option value="IN_FLIGHT" ${f.status === 'IN_FLIGHT' ? 'selected' : ''}>IN_FLIGHT</option>
+                                <option value="LANDED" ${f.status === 'LANDED' ? 'selected' : ''}>LANDED</option>
+                                <option value="DELAYED" ${f.status === 'DELAYED' ? 'selected' : ''}>DELAYED</option>
+                                <option value="CANCELLED" ${f.status === 'CANCELLED' ? 'selected' : ''}>CANCELLED</option>
+                            </select>
+                        </td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteFlight(${f.id}, '${f.flightNumber}')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Populate Dashboard Mini Table
+            dashBody.innerHTML = list.slice(0, 5).map(f => {
+                let badgeClass = 'badge-available';
+                if (f.status === 'IN_FLIGHT') badgeClass = 'badge-inflight';
+                if (f.status === 'DELAYED') badgeClass = 'badge-delayed';
+                if (f.status === 'CANCELLED') badgeClass = 'badge-grounded';
+                if (f.status === 'BOARDING') badgeClass = 'badge-maintenance';
+
+                const dep = f.departureTime ? f.departureTime.replace('T', ' ').substring(11, 16) : '—';
+                return `
+                    <tr>
+                        <td class="fw-bold">${f.flightNumber}</td>
+                        <td>${f.origin} ➔ ${f.destination}</td>
+                        <td><small class="badge bg-light text-dark">${f.aircraftRegistration || 'TBD'}</small></td>
+                        <td>${dep}</td>
+                        <td>Gate ${f.gate || '—'}</td>
+                        <td><span class="badge-status ${badgeClass}">${f.status}</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterFlightsTable() {
+            const q = document.getElementById('flightSearchInput').value.toLowerCase();
+            const status = document.getElementById('flightStatusFilter').value;
+
+            const filtered = globalData.flights.filter(f => {
+                const matchQ = (f.flightNumber && f.flightNumber.toLowerCase().includes(q)) ||
+                               (f.origin && f.origin.toLowerCase().includes(q)) ||
+                               (f.destination && f.destination.toLowerCase().includes(q)) ||
+                               (f.aircraftRegistration && f.aircraftRegistration.toLowerCase().includes(q));
+                const matchStatus = !status || f.status === status;
+                return matchQ && matchStatus;
+            });
+            renderFlightsTable(filtered);
+        }
+
+        function openScheduleFlightModal() {
+            document.getElementById('flightId').value = '';
+            document.getElementById('flNumber').value = 'SG-' + Math.floor(100 + Math.random() * 900);
+            document.getElementById('flOrigin').value = 'JFK';
+            document.getElementById('flDestination').value = 'LHR';
+
+            const now = new Date();
+            now.setHours(now.getHours() + 1);
+            document.getElementById('flDeparture').value = now.toISOString().slice(0, 16);
+            now.setHours(now.getHours() + 7);
+            document.getElementById('flArrival').value = now.toISOString().slice(0, 16);
+
+            new bootstrap.Modal(document.getElementById('flightModal')).show();
+        }
+
+        async function saveFlight(e) {
+            e.preventDefault();
+            const payload = {
+                flightNumber: document.getElementById('flNumber').value.trim().toUpperCase(),
+                aircraftRegistration: document.getElementById('flAircraft').value,
+                origin: document.getElementById('flOrigin').value.trim().toUpperCase(),
+                destination: document.getElementById('flDestination').value.trim().toUpperCase(),
+                departureTime: document.getElementById('flDeparture').value,
+                arrivalTime: document.getElementById('flArrival').value,
+                terminal: document.getElementById('flTerminal').value,
+                gate: document.getElementById('flGate').value,
+                passengerCount: parseInt(document.getElementById('flPax').value) || 0,
+                status: document.getElementById('flStatus').value
+            };
+
+            try {
+                await api('/flights', { method: 'POST', body: JSON.stringify(payload) });
+                bootstrap.Modal.getInstance(document.getElementById('flightModal')).hide();
+                showToast(`Flight ${payload.flightNumber} scheduled successfully.`);
+                loadAllData();
+            } catch (err) {
+                alert('Flight schedule error: ' + err.message);
+            }
+        }
+
+        async function changeFlightStatus(id, newStatus) {
+            try {
+                await api(`/flights/${id}/status`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ status: newStatus })
+                });
+                showToast(`Flight status updated to ${newStatus}`);
+                loadAllData();
+            } catch (err) {
+                alert('Update failed: ' + err.message);
+            }
+        }
+
+        async function deleteFlight(id, num) {
+            if (!confirm(`Cancel and remove flight ${num}?`)) return;
+            try {
+                await api(`/flights/${id}`, { method: 'DELETE' });
+                showToast(`Flight ${num} removed.`);
+                loadAllData();
+            } catch (err) {
+                alert('Delete failed: ' + err.message);
+            }
+        }
+
+        // ==========================================
+        // MAINTENANCE MODULE
+        // ==========================================
+        function renderMaintenanceTable(list) {
+            const tbody = document.getElementById('maintenanceTableBody');
+            if (!list || list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted">No maintenance orders found.</td></tr>';
+                return;
+            }
+
+            const today = new Date().toISOString().slice(0, 10);
+
+            tbody.innerHTML = list.map(m => {
+                const isOverdue = m.dueDate && m.dueDate < today && m.status !== 'COMPLETED';
+                const priorityBadge = m.priority === 'CRITICAL' ? 'bg-danger text-white' :
+                                      m.priority === 'HIGH' ? 'bg-warning text-dark' :
+                                      m.priority === 'MEDIUM' ? 'bg-info text-dark' : 'bg-secondary text-white';
+
+                return `
+                    <tr class="${isOverdue ? 'table-danger' : ''}">
+                        <td class="fw-bold text-primary">${m.aircraftRegistration}</td>
+                        <td>
+                            <div class="fw-semibold">${m.description}</div>
+                            ${m.technicianNotes ? `<small class="text-muted"><i class="bi bi-chat-left-text me-1"></i>${m.technicianNotes}</small>` : ''}
+                        </td>
+                        <td><span class="badge bg-light text-dark border">${m.maintenanceType || 'ROUTINE'}</span></td>
+                        <td><span class="badge ${priorityBadge}">${m.priority}</span></td>
+                        <td>
+                            ${m.dueDate || '—'}
+                            ${isOverdue ? '<span class="badge bg-danger ms-1">OVERDUE</span>' : ''}
+                        </td>
+                        <td>$${(m.estimatedCost || 0).toLocaleString()}</td>
+                        <td>
+                            <span class="badge ${m.status === 'COMPLETED' ? 'bg-success' : m.status === 'IN_PROGRESS' ? 'bg-primary' : 'bg-secondary'}">
+                                ${m.status}
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            ${m.status !== 'COMPLETED' ? `
+                                <button class="btn btn-sm btn-outline-success me-1" onclick="markMaintenanceCompleted(${m.id})" title="Complete Order">
+                                    <i class="bi bi-check-lg"></i> Complete
+                                </button>
+                            ` : ''}
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteMaintenance(${m.id})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterMaintenanceTable() {
+            const q = document.getElementById('maintenanceSearchInput').value.toLowerCase();
+            const priority = document.getElementById('maintenancePriorityFilter').value;
+            const status = document.getElementById('maintenanceStatusFilter').value;
+
+            const filtered = globalData.maintenance.filter(m => {
+                const matchQ = (m.aircraftRegistration && m.aircraftRegistration.toLowerCase().includes(q)) ||
+                               (m.description && m.description.toLowerCase().includes(q));
+                const matchP = !priority || m.priority === priority;
+                const matchS = !status || m.status === status;
+                return matchQ && matchP && matchS;
+            });
+            renderMaintenanceTable(filtered);
+        }
+
+        function openAddMaintenanceModal() {
+            document.getElementById('maintId').value = '';
+            document.getElementById('maintDescription').value = '';
+            document.getElementById('maintType').value = 'ROUTINE';
+            document.getElementById('maintPriority').value = 'MEDIUM';
+
+            const nextWeek = new Date();
+            nextWeek.setDate(nextWeek.getDate() + 7);
+            document.getElementById('maintDueDate').value = nextWeek.toISOString().slice(0, 10);
+            document.getElementById('maintCost').value = '4500';
+
+            new bootstrap.Modal(document.getElementById('maintenanceModal')).show();
+        }
+
+        async function saveMaintenance(e) {
+            e.preventDefault();
+            const payload = {
+                aircraftRegistration: document.getElementById('maintAircraft').value,
+                description: document.getElementById('maintDescription').value.trim(),
+                maintenanceType: document.getElementById('maintType').value,
+                priority: document.getElementById('maintPriority').value,
+                dueDate: document.getElementById('maintDueDate').value,
+                estimatedCost: parseFloat(document.getElementById('maintCost').value) || 0,
+                status: 'OPEN'
+            };
+
+            try {
+                await api('/maintenance', { method: 'POST', body: JSON.stringify(payload) });
+                bootstrap.Modal.getInstance(document.getElementById('maintenanceModal')).hide();
+                showToast(`Work order created for ${payload.aircraftRegistration}`);
+                loadAllData();
+            } catch (err) {
+                alert('Failed to save work order: ' + err.message);
+            }
+        }
+
+        async function markMaintenanceCompleted(id) {
+            try {
+                await api(`/maintenance/${id}/status`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ status: 'COMPLETED' })
+                });
+                showToast('Maintenance marked completed & aircraft released.');
+                loadAllData();
+            } catch (err) {
+                alert('Update failed: ' + err.message);
+            }
+        }
+
+        async function deleteMaintenance(id) {
+            if (!confirm('Delete this maintenance record?')) return;
+            try {
+                await api(`/maintenance/${id}`, { method: 'DELETE' });
+                showToast('Record deleted.');
+                loadAllData();
+            } catch (err) {
+                alert('Delete failed: ' + err.message);
+            }
+        }
+
+        // ==========================================
+        // INCIDENTS MODULE
+        // ==========================================
+        function renderIncidentsTable(list) {
+            const tbody = document.getElementById('incidentsTableBody');
+            const dashBody = document.getElementById('dashboardIncidentsTable');
+
+            if (!list || list.length === 0) {
+                const emptyRow = '<tr><td colspan="8" class="text-center py-4 text-muted">No safety incidents reported.</td></tr>';
+                tbody.innerHTML = emptyRow;
+                dashBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">No incidents on file.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = list.map(i => {
+                const pClass = i.priority === 'CRITICAL' ? 'bg-danger text-white' :
+                               i.priority === 'HIGH' ? 'bg-warning text-dark' : 'bg-info text-dark';
+
+                return `
+                    <tr>
+                        <td class="fw-bold text-danger">${i.incidentNumber || ('INC-' + i.id)}</td>
+                        <td><span class="badge bg-light text-dark border">${i.category}</span></td>
+                        <td>${i.location || '—'}</td>
+                        <td style="max-width: 300px;" class="text-truncate">${i.description}</td>
+                        <td><span class="badge ${pClass}">${i.priority}</span></td>
+                        <td>
+                            <select class="form-select form-select-sm py-0" onchange="changeIncidentStatus(${i.id}, this.value)">
+                                <option value="OPEN" ${i.status === 'OPEN' ? 'selected' : ''}>OPEN</option>
+                                <option value="INVESTIGATING" ${i.status === 'INVESTIGATING' ? 'selected' : ''}>INVESTIGATING</option>
+                                <option value="RESOLVED" ${i.status === 'RESOLVED' ? 'selected' : ''}>RESOLVED</option>
+                                <option value="CLOSED" ${i.status === 'CLOSED' ? 'selected' : ''}>CLOSED</option>
+                            </select>
+                        </td>
+                        <td class="small text-muted">${i.reportedAt ? i.reportedAt.substring(0, 10) : '—'}</td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteIncident(${i.id})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            dashBody.innerHTML = list.slice(0, 5).map(i => {
+                const pClass = i.priority === 'CRITICAL' ? 'bg-danger text-white' :
+                               i.priority === 'HIGH' ? 'bg-warning text-dark' : 'bg-info text-dark';
+                return `
+                    <tr>
+                        <td class="fw-bold">${i.incidentNumber || ('INC-' + i.id)}</td>
+                        <td>${i.category}</td>
+                        <td>${i.location || '—'}</td>
+                        <td><span class="badge ${pClass}">${i.priority}</span></td>
+                        <td><span class="badge bg-secondary">${i.status}</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterIncidentsTable() {
+            const q = document.getElementById('incidentSearchInput').value.toLowerCase();
+            const cat = document.getElementById('incidentCategoryFilter').value;
+
+            const filtered = globalData.incidents.filter(i => {
+                const matchQ = (i.category && i.category.toLowerCase().includes(q)) ||
+                               (i.location && i.location.toLowerCase().includes(q)) ||
+                               (i.description && i.description.toLowerCase().includes(q));
+                const matchCat = !cat || i.category === cat;
+                return matchQ && matchCat;
+            });
+            renderIncidentsTable(filtered);
+        }
+
+        function openReportIncidentModal() {
+            document.getElementById('incCategory').value = 'BIRD_STRIKE';
+            document.getElementById('incPriority').value = 'MEDIUM';
+            document.getElementById('incLocation').value = '';
+            document.getElementById('incDescription').value = '';
+            new bootstrap.Modal(document.getElementById('incidentModal')).show();
+        }
+
+        async function saveIncident(e) {
+            e.preventDefault();
+            const payload = {
+                category: document.getElementById('incCategory').value,
+                priority: document.getElementById('incPriority').value,
+                location: document.getElementById('incLocation').value.trim(),
+                description: document.getElementById('incDescription').value.trim(),
+                reportedBy: document.getElementById('incReportedBy').value.trim(),
+                status: 'OPEN'
+            };
+
+            try {
+                await api('/incidents', { method: 'POST', body: JSON.stringify(payload) });
+                bootstrap.Modal.getInstance(document.getElementById('incidentModal')).hide();
+                showToast('Incident filed successfully.');
+                loadAllData();
+            } catch (err) {
+                alert('Reporting failed: ' + err.message);
+            }
+        }
+
+        async function changeIncidentStatus(id, newStatus) {
+            try {
+                await api(`/incidents/${id}/status`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ status: newStatus })
+                });
+                showToast('Incident status updated to ' + newStatus);
+                loadAllData();
+            } catch (err) {
+                alert('Update failed: ' + err.message);
+            }
+        }
+
+        async function deleteIncident(id) {
+            if (!confirm('Delete this incident report?')) return;
+            try {
+                await api(`/incidents/${id}`, { method: 'DELETE' });
+                showToast('Incident removed.');
+                loadAllData();
+            } catch (err) {
+                alert('Delete failed: ' + err.message);
+            }
+        }
+
+        // ==========================================
+        // ALERTS MODULE
+        // ==========================================
+        function renderAlerts(alerts) {
+            const grid = document.getElementById('alertsGrid');
+            const dashList = document.getElementById('dashboardAlertsList');
+            const critBanner = document.getElementById('criticalAlertBanner');
+            const critText = document.getElementById('criticalAlertText');
+
+            if (!alerts || alerts.length === 0) {
+                grid.innerHTML = '<div class="col-12 text-center text-muted py-5"><i class="bi bi-shield-check text-success fs-1 d-block mb-2"></i>No active operational alerts. Fleet rules nominal.</div>';
+                dashList.innerHTML = '<li class="list-group-item text-success text-center py-3"><i class="bi bi-check-circle me-1"></i> No active warnings or alerts.</li>';
+                critBanner.classList.add('d-none');
+                return;
+            }
+
+            // Check for critical alerts for banner
+            const criticals = alerts.filter(a => a.priority === 'CRITICAL');
+            if (criticals.length > 0) {
+                critText.textContent = criticals[0].message;
+                critBanner.classList.remove('d-none');
+            } else {
+                critBanner.classList.add('d-none');
+            }
+
+            // Full Alerts Grid
+            grid.innerHTML = alerts.map(a => {
+                let borderClass = 'border-info';
+                let iconClass = 'bi-info-circle text-info';
+                let bgBadge = 'bg-info text-dark';
+
+                if (a.priority === 'CRITICAL') {
+                    borderClass = 'border-danger border-2 shadow-sm';
+                    iconClass = 'bi-exclamation-octagon-fill text-danger';
+                    bgBadge = 'bg-danger text-white';
+                } else if (a.priority === 'HIGH') {
+                    borderClass = 'border-warning';
+                    iconClass = 'bi-exclamation-triangle-fill text-warning';
+                    bgBadge = 'bg-warning text-dark';
+                } else if (a.priority === 'MEDIUM') {
+                    borderClass = 'border-secondary';
+                    iconClass = 'bi-bell-fill text-secondary';
+                    bgBadge = 'bg-secondary text-white';
+                }
+
+                return `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 p-3 ${borderClass}" style="border-radius: 10px;">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="badge ${bgBadge}">${a.priority}</span>
+                                <small class="text-muted">${a.category || 'OPERATIONS'}</small>
+                            </div>
+                            <div class="d-flex gap-2 align-items-start mt-1">
+                                <i class="bi ${iconClass} fs-5 mt-1"></i>
+                                <div>
+                                    <div class="fw-semibold text-navy" style="font-size: 0.95rem;">${a.message}</div>
+                                    ${a.reference ? `<small class="text-muted d-block mt-1">Reference: <code>${a.reference}</code></small>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Mini Dashboard List
+            dashList.innerHTML = alerts.slice(0, 4).map(a => {
+                const bgBadge = a.priority === 'CRITICAL' ? 'bg-danger' :
+                                a.priority === 'HIGH' ? 'bg-warning text-dark' : 'bg-info text-dark';
+                return `
+                    <li class="list-group-item d-flex align-items-center justify-content-between px-0 py-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge ${bgBadge}" style="font-size: 0.7rem;">${a.priority}</span>
+                            <span class="small fw-semibold text-truncate" style="max-width: 320px;">${a.message}</span>
+                        </div>
+                        <i class="bi bi-chevron-right text-muted small"></i>
+                    </li>
+                `;
+            }).join('');
+        }
+
+        async function loadAlerts() {
+            try {
+                const alerts = await api('/alerts');
+                globalData.alerts = alerts;
+                renderAlerts(alerts);
+                showToast('Rules evaluated. ' + alerts.length + ' active alert(s).');
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // ==========================================
+        // AI COPILOT MODULE
+        // ==========================================
+        function askPreset(q) {
+            document.getElementById('aiInput').value = q;
+            document.getElementById('aiForm').dispatchEvent(new Event('submit'));
+        }
+
+        async function submitAiQuestion(e) {
+            e.preventDefault();
+            const input = document.getElementById('aiInput');
+            const q = input.value.trim();
+            if (!q) return;
+
+            const chat = document.getElementById('aiChatHistory');
+            // Append User Question
+            const userMsg = document.createElement('div');
+            userMsg.className = 'ai-msg ai-msg-user';
+            userMsg.textContent = q;
+            chat.appendChild(userMsg);
+
+            input.value = '';
+            input.disabled = true;
+            document.getElementById('aiSubmitBtn').disabled = true;
+
+            // Append Loading Indicator
+            const botMsg = document.createElement('div');
+            botMsg.className = 'ai-msg ai-msg-bot';
+            botMsg.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Consulting flight operations & safety rules...';
+            chat.appendChild(botMsg);
+            chat.scrollTop = chat.scrollHeight;
+
+            try {
+                const res = await api('/ai/ask', {
+                    method: 'POST',
+                    body: JSON.stringify({ question: q })
+                });
+
+                // Simple format to HTML
+                let formatted = res.answer
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/\n/g, '<br>');
+
+                botMsg.innerHTML = '<strong>✈ SkyGuard Copilot:</strong><br>' + formatted;
+            } catch (err) {
+                botMsg.innerHTML = '<span class="text-danger"><i class="bi bi-exclamation-circle me-1"></i> AI Engine Error: ' + err.message + '</span>';
+            } finally {
+                input.disabled = false;
+                document.getElementById('aiSubmitBtn').disabled = false;
+                input.focus();
+                chat.scrollTop = chat.scrollHeight;
+            }
+        }
+
+        // ==========================================
+        // USER ADMIN MODULE
+        // ==========================================
+        async function loadUsers() {
+            try {
+                const users = await api('/users');
+                const tbody = document.getElementById('usersTableBody');
+                if (!users || users.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">No users registered.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = users.map(u => `
+                    <tr>
+                        <td>${u.id}</td>
+                        <td class="fw-bold">${u.username}</td>
+                        <td>${u.fullName || '—'}</td>
+                        <td>${u.email || '—'}</td>
+                        <td><span class="badge ${u.role === 'ROLE_ADMIN' ? 'bg-danger' : u.role === 'ROLE_STAFF' ? 'bg-primary' : 'bg-secondary'}">${u.role}</span></td>
+                        <td class="small text-muted">${u.createdAt ? u.createdAt.substring(0, 10) : '—'}</td>
+                        <td class="text-end">
+                            ${currentUser && currentUser.username !== u.username ? `
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteUserAccount(${u.id}, '${u.username}')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            ` : '<span class="badge bg-light text-dark">Current</span>'}
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function deleteUserAccount(id, uname) {
+            if (!confirm(`Delete user account ${uname}?`)) return;
+            try {
+                await api(`/users/${id}`, { method: 'DELETE' });
+                showToast(`User ${uname} deleted.`);
+                loadUsers();
+            } catch (e) {
+                alert('Failed to delete user: ' + e.message);
+            }
+        }
+
+        // ==========================================
+        // CHART VISUALIZATIONS
+        // ==========================================
+        function initChart() {
+            const ctx = document.getElementById('fleetStatusChart').getContext('2d');
+            fleetChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Available', 'In Flight', 'Maintenance', 'Grounded'],
+                    datasets: [{
+                        data: [4, 1, 1, 0],
+                        backgroundColor: ['#10B981', '#0284C7', '#F59E0B', '#EF4444'],
+                        borderWidth: 2,
+                        borderColor: '#FFFFFF'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        function updateCharts(aircraftList, flightsList) {
+            if (!fleetChartInstance || !aircraftList) return;
+            const available = aircraftList.filter(a => a.status === 'AVAILABLE').length;
+            const inFlight = aircraftList.filter(a => a.status === 'IN_FLIGHT').length;
+            const maint = aircraftList.filter(a => a.status === 'MAINTENANCE').length;
+            const grounded = aircraftList.filter(a => a.status === 'GROUNDED').length;
+
+            fleetChartInstance.data.datasets[0].data = [available, inFlight, maint, grounded];
+            fleetChartInstance.update();
+        }
+    </script>
+</body>
+</html>
